@@ -62,7 +62,6 @@ export default function RankText({ userandladder }) {
 
     }
 
-
     if (ladderuser.isMyself){
         return (
             <h3 onClick={() => withdraw()}>Withdraw from Ladder</h3>

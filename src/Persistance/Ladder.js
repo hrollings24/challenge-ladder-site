@@ -17,6 +17,7 @@ export default class Ladder{
     description = ""
     positionsAsLoadedUsers = []
     myPosition = -1
+    url = ""
 
     async loadLadder(withref){
         this.id = withref.id
@@ -30,6 +31,7 @@ export default class Ladder{
         this.requests = ladder.data().positions;
         this.adminIDs = ladder.data().admins;
         this.description = ladder.data().description;
+        this.url = ladder.data().url
 
         await this.loadAfterUserLoaded()
 
@@ -46,26 +48,24 @@ export default class Ladder{
         this.requests = withData.positions;
         this.adminIDs = withData.admins;
         this.description = withData.description;
+        this.url = withData.url
 
 
-        var count = 1
-        for (const position of this.positions){
-            let ladUser = new LadderUser()
-            let isMe = await ladUser.loadWithPosition(position, count)
-            if (isMe){
-                this.myPosition = count
-            }
-            this.positionsAsLoadedUsers.push(ladUser)
-            count++
-        }
-
-        await this.loadAfterUserLoaded()
-
-       
+           
     }
 
     async loadAfterUserLoaded(){
 
+            var count = 1
+            for (const position of this.positions){
+                let ladUser = new LadderUser()
+                let isMe = await ladUser.loadWithPosition(position, count)
+                if (isMe){
+                    this.myPosition = count
+                }
+                this.positionsAsLoadedUsers.push(ladUser)
+                count++
+            }    
 
             const db = firebase.firestore();
             const challengeCollection = db.collection('challenge');
@@ -79,7 +79,6 @@ export default class Ladder{
             const findingChallenges2 = await challengeCollection.where('user2', '==', MainUser.getInstance().getUserID()).where('ladder', '==', this.id).get();
             findingChallenges2.forEach(function(challenge) {
                 const challengedataref = challenge.ref.id
-                console.log(challengedataref.id)
                 this.challengesIHaveWithOtherUserIds.set(challenge.data().user1, {challengedataref});
             }, this);
     

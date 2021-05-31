@@ -6,9 +6,9 @@ import { useHistory } from "react-router-dom"
 export default function LadderCards() {
     const history = useHistory()
 
-    const routeChange = (ladderName) =>{ 
+    const routeChange = (ladderurl) =>{ 
             history.push({
-                pathname: ladderName.replace(/\s/g, ''),
+                pathname: ladderurl,
             })
     }
 
@@ -16,7 +16,7 @@ export default function LadderCards() {
         if (ladder.challengesIHaveWithOtherUserIds.size == 0){
             return (
                 <Col className="container-fluid mt-2">
-                <Card className="card h-100" onClick={() => routeChange(ladder.name)} style={{display: 'flex', flexDirection: 'row'}} key={ladder.id}>
+                <Card className="card h-100" onClick={() => routeChange(ladder.url)} style={{display: 'flex', flexDirection: 'row'}} key={ladder.id}>
                 <Card.Body>
                     <Card.Title>{ladder.name}</Card.Title>
                     <Card.Subtitle className="d-flex">
@@ -34,7 +34,7 @@ export default function LadderCards() {
         if (ladder.challengesIHaveWithOtherUserIds.size == 1){
             return (
                 <Col className="container-fluid mt-2">
-                <Card className="card h-100" onClick={() => routeChange(ladder.name)} style={{display: 'flex', flexDirection: 'row'}} key={ladder.id}>
+                <Card className="card h-100" onClick={() => routeChange(ladder.url)} style={{display: 'flex', flexDirection: 'row'}} key={ladder.id}>
                 <Card.Body>
                     <Card.Title>{ladder.name}</Card.Title>
                     <Card.Subtitle className="d-flex">
@@ -50,7 +50,7 @@ export default function LadderCards() {
 
         return (
             <Col className="container-fluid mt-2">
-                <Card className="card h-100" onClick={() => routeChange(ladder.name)} style={{display: 'flex', flexDirection: 'row'}} key={ladder.id}>
+                <Card className="card h-100" onClick={() => routeChange(ladder.url)} style={{display: 'flex', flexDirection: 'row'}} key={ladder.id}>
                 <Card.Body>
                     <Card.Title>{ladder.name}</Card.Title>
                     <Card.Subtitle className="d-flex">

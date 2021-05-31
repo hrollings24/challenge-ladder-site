@@ -3,7 +3,6 @@ import { useAuth } from "../../contexts/AuthContext"
 import { Container, Row, Col, Button , Modal, Alert} from "react-bootstrap"
 import MainUser from "../../Persistance/MainUser"
 import Sidebar from "../Sidebar.js"
-import ProfileImage from '../ProfileImage'
 import '../images.css';
 import 'antd/dist/antd.css'; 
 import firebase from 'firebase/app'

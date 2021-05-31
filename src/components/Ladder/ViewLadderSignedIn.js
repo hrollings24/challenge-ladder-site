@@ -6,30 +6,60 @@ import LadderRanks from "./LadderRanks"
 import { useAuth } from "../../contexts/AuthContext"
 import MainUser from "../../Persistance/MainUser"
 import { useHistory, useLocation } from "react-router-dom"
+import LoadingOverlay from 'react-loading-overlay';
+import Ladder from "../../Persistance/Ladder"
+import firebase from 'firebase/app';
+import { StayCurrentLandscapeOutlined } from '@material-ui/icons';
 
 
-export default function ViewLadderSignedIn({ ladder }) {
+export default function ViewLadderSignedIn(laddername) {
     const { currentUser, logout } = useAuth()
     const [userDataLoaded, setUserDataLoaded] = useState(false)
     const [ladderChallengesFound, setladderChallengesFound] = useState(false)
     const [showAlert, setShowAlert] = useState(false)
     const history = useHistory()
     const location = useLocation()
+    const [ladder, setLadder] = useState(null);
+    const [loading, setLoading] = useState(true);
 
 
-    async function userLoaded() {
+    var refsAsArray = []
+
+    const loadLadder = async () => {  
+        const db = firebase.firestore();
+        console.log(laddername.laddername.replace('/', ''))
+        const ladderRefs = await db.collection('ladders').where("url", "==", laddername.laddername.replace('/', '')).get()  
+        
+        ladderRefs.forEach(function(doc) {
+            refsAsArray.push(doc)
+        });
+
+        for (const docu of refsAsArray){
+            const lad = new Ladder()
+            await lad.load(docu.data(), docu)
+            setLadder(lad)
+            await lad.loadAfterUserLoaded()  
+        }
+    }
+
+    const loadUser = async () => {  
 
         if (MainUser.getInstance().getUserID() == ""){
             await MainUser.getInstance().setUser(currentUser.uid);
             setUserDataLoaded(true);
-            await ladder.loadAfterUserLoaded()
-            setladderChallengesFound(true)
         }
         else{
             setUserDataLoaded(true);
             await ladder.loadAfterUserLoaded()
             setladderChallengesFound(true)
+            setLoading(false)
         }
+    }
+
+    async function startLoad(){
+        await loadUser()
+        await loadLadder()
+        setLoading(false)
     }
 
     useEffect(() => {
@@ -37,8 +67,10 @@ export default function ViewLadderSignedIn({ ladder }) {
         if (query == "success"){
             setShowAlert(true)
         }
+        else{
+            startLoad()
+        }
 
-        userLoaded()
     },[]); 
 
     const removeAlert = () =>{ 
@@ -53,55 +85,45 @@ export default function ViewLadderSignedIn({ ladder }) {
         }
     },[ladderChallengesFound]); 
 
-    if (!ladderChallengesFound){
-        return (
-            <div>
-            <Container fluid style={{ paddingLeft: 0, paddingRight: 0 }}>
-                <Row>
-                    <Col md="auto">
-                        <Sidebar></Sidebar>
-                    </Col>
-                    <Col>
-                        <Row style={{ paddingTop: 20, paddingRight: 20}}> 
-                            Loading...   
-                        </Row>
-                    </Col>
-                </Row>
-            </Container>
-        </div>
-        )
-    }
-
     return (
         <div>
-            <Container fluid style={{ paddingLeft: 0, paddingRight: 0 }}>
-                <Row>
-                    <Col md="auto">
-                        <Sidebar></Sidebar>
-                    </Col>
-                    <Col>
-                        <Row style={{ paddingTop: 20, paddingRight: 20}}> 
-                            <Container>
-                                <Row>
-                                <h1 className = "homeh2">{ladder.name}</h1>
-                                </Row>
-                                <Row>
-                                <Alert show={showAlert} variant={'success'}>
-                                    Successfully removed from ladder. <Alert.Link onClick={() => removeAlert()} >Remove</Alert.Link>
-                                </Alert>
-                                </Row>
-                                <Row style={{ paddingTop: 20, paddingLeft: 20}}>
-                                {
-                                    ladderChallengesFound ?
-                                    <LadderRanks ladder = {ladder}></LadderRanks>:
-                                    <div>loading...</div>
-                                }
-                                </Row>
-                            </Container>     
-                        </Row>
-                    </Col>
-                </Row>
-            </Container>
+            <LoadingOverlay
+                active={loading}
+                spinner
+                text="Loading">
+                <Container fluid style={{ paddingLeft: 0, paddingRight: 0 }}>
+                    <Row>
+                        <Col md="auto">
+                            <Sidebar></Sidebar>
+                        </Col>
+                        <Col>
+                            <Row style={{ paddingTop: 20, paddingRight: 20}}> 
+                                <Container>
+                                    <Row>
+                                    {
+                                        !loading ?
+                                        <h1 className = "homeh2">{ladder.name}</h1>:
+                                        <div></div>
+                                    }
+                                    </Row>
+                                    <Row>
+                                    <Alert show={showAlert} variant={'success'}>
+                                        Successfully removed from ladder. <Alert.Link onClick={() => removeAlert()} >Remove</Alert.Link>
+                                    </Alert>
+                                    </Row>
+                                    <Row style={{ paddingTop: 20, paddingLeft: 20}}>
+                                    {
+                                        !loading ?
+                                        <LadderRanks ladder = {ladder}></LadderRanks>:
+                                        <div></div>
+                                    }
+                                    </Row>
+                                </Container>     
+                            </Row>
+                        </Col>
+                    </Row>
+                </Container>
+            </LoadingOverlay>
         </div>
     )
 

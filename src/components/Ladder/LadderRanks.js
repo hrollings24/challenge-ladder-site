@@ -1,8 +1,8 @@
 import React from 'react'
 import './Ladder.css';
 import { Container, Row, Col, ListGroup } from "react-bootstrap"
-import ProfileImage from '../ProfileImage'
 import RankText from './RankText'
+import Avatar from 'react-avatar';
 
 export default function LadderRanks({ ladder }) {
 
@@ -12,9 +12,7 @@ export default function LadderRanks({ ladder }) {
             <Container key={ladderUser.id}>
                 <Row md="auto">
                     <Col md="auto">
-                        <div className = "profileContainer">
-                        <ProfileImage url = {ladderUser.picture}></ProfileImage>
-                        </div>
+                        <Avatar round = {true} name={ladderUser.getFullName()} src={ladderUser.picture}/>
                     </Col>
 
                     <Col className="container-fluid mt-2">
@@ -40,7 +38,7 @@ export default function LadderRanks({ ladder }) {
             </Container>    
         )
     }
-
+    console.log(ladder)
     return (
         <div>
             {ladder.positionsAsLoadedUsers.map(renderRank)}    

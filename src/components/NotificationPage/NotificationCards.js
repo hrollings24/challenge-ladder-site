@@ -45,7 +45,7 @@ export default function NotificationCards() {
             case 'invite':
                 return (
                     <div>
-                        <Card.Link href="#">Accept</Card.Link>
+                        <Card.Link onClick={acceptNormalInvite(notification)}>Accept</Card.Link>
                         <Card.Link href="#">Decline</Card.Link>
                     </div>
                 )
@@ -144,15 +144,16 @@ export default function NotificationCards() {
 
     }
 
-    const acceptNormalInvite = (notification) => {
-        notification.ladderRef.update({
+    const acceptNormalInvite = (note) => {
+        console.log(note)
+        note.ladderRef.update({
             positions: firebase.firestore.FieldValue.arrayUnion(MainUser.getInstance().userID)
         })
        
         MainUser.getInstance().ref.update({
-            ladders: firebase.firestore.FieldValue.arrayUnion(notification.ladderRef)
+            ladders: firebase.firestore.FieldValue.arrayUnion(note.ladderRef)
         });
-        removeNote(notification)
+        removeNote(note)
     }
 
 

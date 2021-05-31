@@ -4,7 +4,6 @@ import { useHistory } from "react-router-dom"
 import { Container, Row, Col } from "react-bootstrap"
 import MainUser from "../../Persistance/MainUser"
 import Sidebar from "../Sidebar.js"
-import ProfileImage from '../ProfileImage'
 import './findladder.css';
 
 export default function FindLadder() {
