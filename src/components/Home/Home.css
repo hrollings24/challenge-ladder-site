@@ -1,0 +1,42 @@
+
+.ladderImage {
+    height: 400px;
+    width: 400px; 
+    top: 40px;
+    left: 40px;
+}
+
+.awaitColumn{
+    top: 50px;
+}
+
+.card-body {
+    min-height: 300px;
+    min-width: 400px;
+    margin-right: 5px;
+}
+
+.homeh2 {
+    margin-left: 15px;
+}
+
+.marginLeft {
+    margin-left: 15px;
+}
+
+
+.homeh2left {
+    margin-left: 0px;
+}
+
+.capitalize {
+    text-transform: capitalize;
+}
+
+.logo {
+    Display: flex;
+    height: 86.6px;
+    width: 260px; 
+    Align-Items: center;
+    Justify-Content: centre;
+}

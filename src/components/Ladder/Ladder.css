@@ -1,0 +1,27 @@
+.list-group-item {
+    border: 0 !important;
+    margin: 0px;
+    padding-top: 20px;
+}
+
+.list-group {
+    border: 0 !important;
+    margin: 0px;
+    padding-top: 20px;
+    background-color: transparent;
+}
+
+
+
+
+.rankText{
+    background-color: white;
+}
+
+.profileContainer{
+    width: 100px;
+    height: 100px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 50%;
+}
