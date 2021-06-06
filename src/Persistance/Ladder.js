@@ -56,6 +56,8 @@ export default class Ladder{
 
     async loadAfterUserLoaded(){
 
+            this.positionsAsLoadedUsers = []
+            this.challengesIHaveWithOtherUserIds.clear()
             var count = 1
             for (const position of this.positions){
                 let ladUser = new LadderUser()
@@ -85,6 +87,10 @@ export default class Ladder{
     
             return this.challengesIHsaveWithOtherUserIds
         
+
+    }
+
+    refresh(){
 
     }
 

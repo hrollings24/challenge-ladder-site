@@ -4,7 +4,7 @@ import MainUser from "../../Persistance/MainUser"
 import firebase from 'firebase/app';
 require("firebase/functions")
 
-export default function RankText({ userandladder, loading, setLoading }) {
+export default function RankText({ userandladder, loading, setLoading, setSuccess, setError}) {
     const history = useHistory()
     const ladderuser = userandladder[0]
     const ladder = userandladder[1]
@@ -31,9 +31,42 @@ export default function RankText({ userandladder, loading, setLoading }) {
           }) 
     }
 
-    const startChallenge = () =>{ 
+    const startChallenge = async () =>{ 
         console.log("start challenge clicked")
-        
+        setLoading(true)
+        //data = [toUser, fromUser, ladderID, message, ladderName]
+        const challengeData = {
+            ladderID: ladder.id,
+            toUser: ladderuser.userID,
+            fromUser: MainUser.getInstance().userID,
+            message: MainUser.getInstance().username + " has challenged you in " + ladder.name,
+            ladderName: ladder.name
+        };
+
+        const callableReturnMessage = firebase.functions().httpsCallable('createChallenge');
+        callableReturnMessage(challengeData).then((result) => {
+            if (result.data.title != 'Error'){
+                //refresh ladder
+                MainUser.getInstance().refresh().then(() => {
+                    setSuccess(result.data.message)
+                    ladder.loadAfterUserLoaded().then(() => {
+                        setLoading(false)
+                    })
+                }).catch((error) => {
+                    console.log(`error: ${JSON.stringify(error)}`);
+                    setLoading(false)
+                    });  
+            }
+            else{
+                setError(result.data.message)
+                setLoading(false)
+            }
+        }).catch((error) => {
+          console.log(`error: ${JSON.stringify(error)}`);
+          setError(error)
+          setLoading(false)
+        });
+
     }
 
     const withdraw = async () => {
@@ -52,7 +85,7 @@ export default function RankText({ userandladder, loading, setLoading }) {
             console.log(result.data);
             if(amIAdmin){
                 MainUser.getInstance().refresh().then(() => {
-                    showAlert()
+                    setSuccess("Withdrawn from Ladder")
                     setLoading(false)
                 }).catch((error) => {
                     console.log(`error: ${JSON.stringify(error)}`);

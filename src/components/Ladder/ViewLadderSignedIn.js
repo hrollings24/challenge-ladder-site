@@ -14,11 +14,12 @@ import firebase from 'firebase/app';
 export default function ViewLadderSignedIn(laddername) {
     const { currentUser, logout } = useAuth()
     const [userDataLoaded, setUserDataLoaded] = useState(false)
-    const [showAlert, setShowAlert] = useState(false)
     const history = useHistory()
     const location = useLocation()
     const [ladder, setLadder] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [success, setSuccess] = useState("");
+    const [error, setError] = useState("");
 
 
     var refsAsArray = []
@@ -58,20 +59,15 @@ export default function ViewLadderSignedIn(laddername) {
     }
 
     useEffect(() => {
-        let query = location.search.split('?')[1]
-        if (query == "success"){
-            setShowAlert(true)
-        }
-        else{
-            startLoad()
-        }
-
+        startLoad()
     },[]); 
 
     const removeAlert = () =>{ 
-        setShowAlert(false)
-        history.replace(ladder.name.replace(/\s/g, ''))
-        
+        setSuccess("")        
+    }
+
+    const removeErrorAlert = () =>{ 
+        setError("")        
     }
 
     return (
@@ -86,29 +82,34 @@ export default function ViewLadderSignedIn(laddername) {
                             <Sidebar></Sidebar>
                         </Col>
                         <Col>
-                            <Row style={{ paddingTop: 20, paddingRight: 20}}> 
-                                <Container>
-                                    <Row>
-                                    {
-                                        !loading ?
-                                        <h1 className = "homeh2">{ladder.name}</h1>:
-                                        <div></div>
-                                    }
-                                    </Row>
-                                    <Row>
-                                    <Alert show={showAlert} variant={'success'}>
-                                        Successfully removed from ladder. <Alert.Link onClick={() => removeAlert()} >Remove</Alert.Link>
-                                    </Alert>
-                                    </Row>
-                                    <Row style={{ paddingTop: 20, paddingLeft: 20}}>
-                                    {
-                                        !loading ?
-                                        <LadderRanks ladder = {ladder} loading = {loading} setLoading = {setLoading}></LadderRanks>:
-                                        <div></div>
-                                    }
-                                    </Row>
-                                </Container>     
-                            </Row>
+                            <Container style={{ paddingTop: 20, paddingRight: 20 }}>
+                                <Row>
+                                {
+                                    !loading ?
+                                    <h1 className = "homeh2">{ladder.name}</h1>:
+                                    <div></div>
+                                }
+                                </Row>
+                                <Alert show={error!=""} variant="danger" onClose={() => removeErrorAlert()} dismissible>
+                                    <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
+                                    <p>
+                                    {error}
+                                    </p>
+                                </Alert>
+                                <Alert show={success!=""} variant="success" onClose={() => removeAlert()} dismissible>
+                                    <Alert.Heading>Success!</Alert.Heading>
+                                    <p>
+                                    {success}
+                                    </p>
+                                </Alert>
+                                <Row style={{ paddingTop: 20, paddingLeft: 20}}>
+                                {
+                                    !loading ?
+                                    <LadderRanks ladder = {ladder} loading = {loading} setLoading = {setLoading} setSuccess={setSuccess} setError={setError}></LadderRanks>:
+                                    <div></div>
+                                }
+                                </Row>
+                            </Container>     
                         </Col>
                     </Row>
                 </Container>
