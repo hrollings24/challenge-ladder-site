@@ -4,7 +4,7 @@ import MainUser from "../../Persistance/MainUser"
 import firebase from 'firebase/app';
 require("firebase/functions")
 
-export default function RankText({ userandladder }) {
+export default function RankText({ userandladder, loading, setLoading }) {
     const history = useHistory()
     const ladderuser = userandladder[0]
     const ladder = userandladder[1]
@@ -36,8 +36,9 @@ export default function RankText({ userandladder }) {
         
     }
 
-    const withdraw = () =>{ 
+    const withdraw = async () => {
 
+        setLoading(true)
         const amIAdmin = ladder.adminIDs.includes(MainUser.getInstance().userID)
         const withdrawData = {
             ladderID: ladder.id,
@@ -48,30 +49,42 @@ export default function RankText({ userandladder }) {
         const callableReturnMessage = firebase.functions().httpsCallable('withdrawUserFromLadder');
 
         callableReturnMessage(withdrawData).then((result) => {
-          console.log(result.data);
-          if(amIAdmin){
-            showAlert()
-          }
-          else{
-            goHome()
-          }
+            console.log(result.data);
+            if(amIAdmin){
+                MainUser.getInstance().refresh().then(() => {
+                    showAlert()
+                    setLoading(false)
+                }).catch((error) => {
+                    console.log(`error: ${JSON.stringify(error)}`);
+                    setLoading(false)
+                    });
+            }
+            else{
+                MainUser.getInstance().refresh().then(() => {
+                    showAlert()
+                    setLoading(false)
+                    goHome()
+                }).catch((error) => {
+                    console.log(`error: ${JSON.stringify(error)}`);
+                    setLoading(false)
+                    });
+            }
         }).catch((error) => {
           console.log(`error: ${JSON.stringify(error)}`);
+          setLoading(false)
         });
-
-
     }
 
     if (ladderuser.isMyself){
         return (
-            <h3 onClick={() => withdraw()}>Withdraw from Ladder</h3>
+            <h3 onClick={() => withdraw()} style={{cursor: "pointer"}} >Withdraw from Ladder</h3>
         )
     }
 
     if (ladder.challengesIHaveWithOtherUserIds.get(ladderuser.userID) != undefined){
         console.log(challengeref.challengedataref)
         return (
-            <h3 onClick={() => routeChange(challengeref.challengedataref)}>View Challenge</h3>
+            <h3 onClick={() => routeChange(challengeref.challengedataref)} style={{cursor: "pointer"}} >View Challenge</h3>
         )
     }
 
@@ -79,7 +92,7 @@ export default function RankText({ userandladder }) {
 
     if ((ladderuser.position < ladder.myPosition) && (ladderuser.position >= ladder.myPosition-ladder.jump)){
         return (
-            <h3 onClick={() => startChallenge()} >Start a challenge</h3>
+            <h3 onClick={() => startChallenge()} style={{cursor: "pointer"}} >Start a challenge</h3>
         )
     }
 

@@ -10,7 +10,6 @@ export default function ViewLadder(props) {
     
     var refsAsArray = []
 
-    console.log(props)
     if (currentUser != null){
         return (
             <div>

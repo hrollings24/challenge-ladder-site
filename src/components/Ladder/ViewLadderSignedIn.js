@@ -9,13 +9,11 @@ import { useHistory, useLocation } from "react-router-dom"
 import LoadingOverlay from 'react-loading-overlay';
 import Ladder from "../../Persistance/Ladder"
 import firebase from 'firebase/app';
-import { StayCurrentLandscapeOutlined } from '@material-ui/icons';
 
 
 export default function ViewLadderSignedIn(laddername) {
     const { currentUser, logout } = useAuth()
     const [userDataLoaded, setUserDataLoaded] = useState(false)
-    const [ladderChallengesFound, setladderChallengesFound] = useState(false)
     const [showAlert, setShowAlert] = useState(false)
     const history = useHistory()
     const location = useLocation()
@@ -50,9 +48,6 @@ export default function ViewLadderSignedIn(laddername) {
         }
         else{
             setUserDataLoaded(true);
-            await ladder.loadAfterUserLoaded()
-            setladderChallengesFound(true)
-            setLoading(false)
         }
     }
 
@@ -78,12 +73,6 @@ export default function ViewLadderSignedIn(laddername) {
         history.replace(ladder.name.replace(/\s/g, ''))
         
     }
-
-    useEffect(() => {
-        if (ladderChallengesFound){
-            
-        }
-    },[ladderChallengesFound]); 
 
     return (
         <div>
@@ -114,7 +103,7 @@ export default function ViewLadderSignedIn(laddername) {
                                     <Row style={{ paddingTop: 20, paddingLeft: 20}}>
                                     {
                                         !loading ?
-                                        <LadderRanks ladder = {ladder}></LadderRanks>:
+                                        <LadderRanks ladder = {ladder} loading = {loading} setLoading = {setLoading}></LadderRanks>:
                                         <div></div>
                                     }
                                     </Row>

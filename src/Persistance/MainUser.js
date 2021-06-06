@@ -43,6 +43,7 @@ export default class MainUser extends User{
     }
 
     async getNotes(){
+        this.listOfNotes = []
         this.listOfNotes = await this.getNotifications();
     }
 
@@ -55,6 +56,7 @@ export default class MainUser extends User{
     }
 
     async addLadders(){
+        this.ladders = []
         for (const ref of this.ladderRefs){
             let newLadder = new Ladder();
             await newLadder.loadLadder(ref)
@@ -71,6 +73,7 @@ export default class MainUser extends User{
     }
 
     async loadChallenges(){
+        this.listOfChallenges = []
         for (const challengeRef of this.challengeRefList){
             let challenge = new Challenge();
             await challenge.load(challengeRef)
@@ -100,6 +103,27 @@ export default class MainUser extends User{
         return listOfNotes
 
     }
+
+    async refresh(){
+        console.log("refreshing")
+        const db = firebase.firestore();
+        let userRef = db.collection('users').doc(this.userID)
+        let user = await userRef.get();
+        this.ref = userRef
+        this.challengeRefList = user.data().challenges;
+        this.firstName = user.data().firstName;
+        this.surname = user.data().surname;
+        this.ladderRefs = user.data().ladders;
+        this.picture = user.data().picture;
+        this.username = user.data().username;
+        await this.addLadders();
+        await this.loadChallenges();
+        await this.getNotes()
+        console.log("refreshing done")
+
+    }
+
+    
 
   
 

@@ -6,7 +6,7 @@ import firebase from 'firebase/app';
 import 'firebase/firestore';
 
 
-export default function NotificationCards() {
+export default function NotificationCards({setProcessingNote, setError, setSuccess}) {
    
 
     const renderCards = (notification) => {
@@ -45,7 +45,7 @@ export default function NotificationCards() {
             case 'invite':
                 return (
                     <div>
-                        <Card.Link onClick={acceptNormalInvite(notification)}>Accept</Card.Link>
+                        <Card.Link onClick={() => { acceptNormalInvite(notification) }}>Accept</Card.Link>
                         <Card.Link href="#">Decline</Card.Link>
                     </div>
                 )
@@ -144,27 +144,27 @@ export default function NotificationCards() {
 
     }
 
-    const acceptNormalInvite = (note) => {
-        console.log(note)
-        note.ladderRef.update({
+    const acceptNormalInvite = async (note) => {
+        console.log("Accepting invite...")
+        setProcessingNote(true)
+        await note.ladderRef.update({
             positions: firebase.firestore.FieldValue.arrayUnion(MainUser.getInstance().userID)
         })
        
-        MainUser.getInstance().ref.update({
+        await MainUser.getInstance().ref.update({
             ladders: firebase.firestore.FieldValue.arrayUnion(note.ladderRef)
         });
-        removeNote(note)
+        await removeNote(note)
+        await MainUser.getInstance().refresh()
+        setSuccess("Invite accepted")
+        setProcessingNote(false)
+
     }
 
 
-    const removeNote = (notification) => {
-        notification.delete()
+    const removeNote = async (notification) => {
+        await notification.delete()
     }
-
-
-
-
-
 
     return (
         <div className="container-fluid py-2">
@@ -172,7 +172,7 @@ export default function NotificationCards() {
                 <Container>
                     <Row>
                         {MainUser.getInstance().listOfNotes.map(renderCards)}
-                  </Row>
+                    </Row>
                 </Container>
             </div>
         </div>

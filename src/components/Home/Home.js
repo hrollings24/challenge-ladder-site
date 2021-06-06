@@ -23,6 +23,7 @@ export default function Home(props){
         
         if (MainUser.getInstance().getUserID() == ""){
             await MainUser.getInstance().setUser(currentUser.uid);
+            console.log(MainUser.getInstance().getLadders())
             setUserDataLoaded(true);
         }
         else{
@@ -31,11 +32,11 @@ export default function Home(props){
     }
 
     useEffect(() => {
+        console.log("At home")
         let query = location.search
         if (query == "?success"){
             setShowAlert(true)
         }
-
         userLoaded()
     },[]); 
 

@@ -4,7 +4,7 @@ import { Container, Row, Col, ListGroup } from "react-bootstrap"
 import RankText from './RankText'
 import Avatar from 'react-avatar';
 
-export default function LadderRanks({ ladder }) {
+export default function LadderRanks({ ladder, loading, setLoading}) {
 
     const renderRank = (ladderUser) => {
         let userandladder = [ladderUser, ladder]
@@ -27,7 +27,7 @@ export default function LadderRanks({ ladder }) {
                             </Col>
 
                             <Col className="container-fluid mt-2">
-                                <RankText userandladder = {userandladder}></RankText>
+                                <RankText userandladder = {userandladder} loading = {loading} setLoading = {setLoading}></RankText>
                             </Col>
 
                         </Row>  
@@ -38,7 +38,6 @@ export default function LadderRanks({ ladder }) {
             </Container>    
         )
     }
-    console.log(ladder)
     return (
         <div>
             {ladder.positionsAsLoadedUsers.map(renderRank)}    
