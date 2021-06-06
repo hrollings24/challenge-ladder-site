@@ -94,4 +94,8 @@ export default class Ladder{
 
     }
 
+    amIAdmin(){
+        return (this.adminIDs.includes(MainUser.getInstance().userID))
+    }
+
 }

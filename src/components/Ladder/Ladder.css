@@ -11,7 +11,24 @@
     background-color: transparent;
 }
 
+.h3-ladder {
+    margin-left: 15px;
+    size: 16px
+}
 
+
+.h1-ladder {
+    margin-left: 15px;
+    size: 24px
+}
+
+.p-ladder-margin{
+    margin-left: 15px;
+}
+
+.capitalize {
+    text-transform: capitalize;
+}
 
 
 .rankText{

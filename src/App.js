@@ -5,7 +5,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import Home from './components/Home/Home.js';
 import Login from './components/Login';
-import PrivateRoute from './components/PrivateRoute';
+import PrivateRoute from './Routes/PrivateRoute';
 import ViewLadder from './components/Ladder/ViewLadder';
 import NotificationPage from './components/NotificationPage/NotificationPage';
 import ChallengeView from './components/Challenge/ChallengeView';
@@ -13,6 +13,7 @@ import Account from './components/Account/Account';
 import FindLadder from './components/Find/findladder';
 import CreateLadder from './components/Create/CreateLadder';
 import HomeAway from './components/SignedOut/HomeAway';
+import LadderSettings from './components/LadderSettings/LadderSettings';
 
 
 function App() {
@@ -33,7 +34,8 @@ function App() {
               <Route path="/signup" component={Signup} />
               <Route path="/login" component={Login} />
               <Route path="/home" component={HomeAway} />
-              <Route path="/:ladderurl" component={ViewLadder} />
+              <Route exact path="/:ladderurl" component={ViewLadder} />
+              <PrivateRoute exact path="/:ladderurl/admin" component={LadderSettings} />
             </Switch>
           </AuthProvider>
         </Router>
