@@ -32,4 +32,11 @@ export default class LadderUser extends User{
         return false
     }
 
+    loadWithIDAndData(withData, withID){
+        this.firstName = withData.firstName
+        this.surname = withData.surname
+        this.userID = withID
+        this.username = withData.username
+    }
+
 }

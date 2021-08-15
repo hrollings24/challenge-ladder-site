@@ -28,7 +28,7 @@ export default class Ladder{
         this.positions = ladder.data().positions;
         this.jump = ladder.data().jump;
         this.permission = ladder.data().permission;
-        this.requests = ladder.data().positions;
+        this.requests = ladder.data().requests;
         this.adminIDs = ladder.data().admins;
         this.description = ladder.data().description;
         this.url = ladder.data().url
@@ -45,7 +45,7 @@ export default class Ladder{
         this.positions = withData.positions;
         this.jump = withData.jump;
         this.permission = withData.permission;
-        this.requests = withData.positions;
+        this.requests = withData.requests;
         this.adminIDs = withData.admins;
         this.description = withData.description;
         this.url = withData.url

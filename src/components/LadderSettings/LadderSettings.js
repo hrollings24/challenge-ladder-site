@@ -38,7 +38,6 @@ export default function LadderSettings(props) {
         else{
             url = name[0]
         }
-        console.log(laddername.replace('/', ''))
         const ladderRefs = await db.collection('ladders').where("url", "==", url).get()  
         
         ladderRefs.forEach(function(doc) {
@@ -59,10 +58,6 @@ export default function LadderSettings(props) {
         setLadderLoading(false)
 
     }
-
-    useEffect(() => {
-        console.log(ladder)
-    },[ladder]); 
 
     const loadUser = async () => {  
 
@@ -127,7 +122,6 @@ export default function LadderSettings(props) {
                                     {
                                         authorised ?
                                         <div>
-                                        {console.log(ladder)}
                                         <SettingsPage ladderParam={ladder} ></SettingsPage> </div>:
                                         <ForbiddenSettings></ForbiddenSettings>
                                     } 
