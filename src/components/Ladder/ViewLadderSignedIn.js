@@ -10,7 +10,7 @@ import { useHistory, useLocation } from "react-router-dom"
 import LoadingOverlay from 'react-loading-overlay';
 import Ladder from "../../Persistance/Ladder"
 import firebase from 'firebase/app';
-
+import UserSearch from '../PopupModal/UserSearch';
 
 export default function ViewLadderSignedIn(laddername) {
     const { currentUser, logout } = useAuth()
@@ -23,6 +23,11 @@ export default function ViewLadderSignedIn(laddername) {
     const [success, setSuccess] = useState("");
     const [error, setError] = useState("");
 
+    const [showSearch, setShowSearch] = useState(false)
+
+    const addUserClicked = () => {
+        setShowSearch(true)
+    }
 
     var refsAsArray = []
 
@@ -85,6 +90,7 @@ export default function ViewLadderSignedIn(laddername) {
 
     return (
         <div>
+            <UserSearch showSearch={showSearch} setShowSearch={setShowSearch} ladderData={ladder} purpose={"user"}></UserSearch>   
             <LoadingOverlay
                 active={loading}
                 spinner
@@ -110,7 +116,7 @@ export default function ViewLadderSignedIn(laddername) {
                                     {
                                         ladder.amIAdmin() ?
                                         <h3 className= "h3-ladder" onClick={gotoSettings}>Settings</h3>:
-                                        <h3>Invite</h3>
+                                        <h3 className="text-right" onClick={() => addUserClicked()} style={{cursor: "pointer"}}>Invite</h3>
                                     }</div>:
                                     <div>
                                     </div>
