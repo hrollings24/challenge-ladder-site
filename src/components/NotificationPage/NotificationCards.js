@@ -10,9 +10,6 @@ export default function NotificationCards({setProcessingNote, setError, setSucce
    
 
     const renderCards = (notification) => {
-        console.log(notification.title)
-
-        
         return (
             <Col className="container-fluid mt-4">
                 <Card style={{display: 'flex', flexDirection: 'row'}} key={notification.title}>
@@ -52,8 +49,8 @@ export default function NotificationCards({setProcessingNote, setError, setSucce
             case 'admin':
                 return (
                     <div>
-                        <Card.Link href="#">Accept</Card.Link>
-                        <Card.Link href="#">Decline</Card.Link>
+                        <Card.Link onClick={() => { acceptAdminInvite(notification) }}>Accept</Card.Link>
+                        <Card.Link onClick={() => { declineAdminInvite(notification) }}>Decline</Card.Link>
                     </div>
                 )
             case 'request':
@@ -125,19 +122,23 @@ export default function NotificationCards({setProcessingNote, setError, setSucce
     }
 
     const acceptAdminInvite = (notification) => {
-        
+        console.log(notification)
+        setProcessingNote(true)
+
         const data = {
             fromUserID: MainUser.getInstance().userID,
             ladderID: notification.ladderRef.id,
             notificationID: notification.id,
             username: MainUser.getInstance().username,
-            toUserID: notification.fromUser.id,
+            toUserID: notification.fromUserRef.id,
         };
 
         const callableReturnMessage = firebase.functions().httpsCallable('acceptAdminInvite');
 
-        callableReturnMessage().then((result) => {
+        callableReturnMessage(data).then((result) => {
           console.log(result.data.output);
+          setProcessingNote(false)
+
         }).catch((error) => {
           console.log(`error: ${JSON.stringify(error)}`);
         });
@@ -163,7 +164,10 @@ export default function NotificationCards({setProcessingNote, setError, setSucce
 
 
     const removeNote = async (notification) => {
+        setProcessingNote(true)
         await notification.delete()
+        await MainUser.getInstance().refresh()
+        setProcessingNote(false)
     }
 
     return (
@@ -171,7 +175,15 @@ export default function NotificationCards({setProcessingNote, setError, setSucce
             <div className="d-flex flex-row flex-nowrap">
                 <Container>
                     <Row>
-                        {MainUser.getInstance().listOfNotes.map(renderCards)}
+                        {
+                            MainUser.getInstance().listOfNotes.length > 0 ?
+                            <div>
+                                {MainUser.getInstance().listOfNotes.map(renderCards)}
+                            </div>:
+                            <div>
+                                <h3>You have no notifications</h3>
+                            </div>
+                        }
                     </Row>
                 </Container>
             </div>

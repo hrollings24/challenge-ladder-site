@@ -1,8 +1,7 @@
 import React from 'react'
 import LadderUserDisplayer from './LadderUserDisplayer'
 
-export default function ViewRequests(ladderParam) {
-    let ladder = ladderParam.ladderParam
+export default function ViewRequests({ladder}) {
 
     if (ladder.permission == "Open"){
         return (

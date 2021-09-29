@@ -90,12 +90,39 @@ export default class Ladder{
 
     }
 
-    refresh(){
+    async refresh(){
+        const db = firebase.firestore();
 
+        var ref = db.collection('ladders').doc(this.id)
+        let ladder = await ref.get();
+        
+        this.name = ladder.data().name;
+        this.positions = ladder.data().positions;
+        this.jump = ladder.data().jump;
+        this.permission = ladder.data().permission;
+        this.requests = ladder.data().requests;
+        this.adminIDs = ladder.data().admins;
+        this.description = ladder.data().description;
+        this.url = ladder.data().url
+
+        await this.loadAfterUserLoaded()
     }
 
     amIAdmin(){
+        console.log(this.adminIDs)
         return (this.adminIDs.includes(MainUser.getInstance().userID))
+    }
+
+    async removeAdmin(adminID){
+        console.log(adminID)
+        const index = this.adminIDs.indexOf(adminID);
+        if (index > -1) {
+            this.adminIDs.splice(index, 1);
+        }
+
+        const db = firebase.firestore();
+        let docRef = db.collection('ladders').doc(this.id)
+        await docRef.update({admins: this.adminIDs})
     }
 
 }

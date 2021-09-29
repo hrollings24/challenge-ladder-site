@@ -40,9 +40,11 @@ export default function ViewLadderSignedIn(laddername) {
             refsAsArray.push(doc)
         });
 
+
         for (const docu of refsAsArray){
             const lad = new Ladder()
             await lad.load(docu.data(), docu)
+            console.log(lad)
             setLadder(lad)
             await lad.loadAfterUserLoaded()  
             
@@ -68,6 +70,7 @@ export default function ViewLadderSignedIn(laddername) {
         await loadUser()
         await loadLadder()
         setLoading(false)
+        console.log(ladder)
     }
 
     useEffect(() => {

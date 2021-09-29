@@ -7,6 +7,7 @@ export default function LadderCards() {
     const history = useHistory()
 
     const routeChange = (ladderurl) =>{ 
+        console.log(ladderurl)
             history.push({
                 pathname: ladderurl,
             })

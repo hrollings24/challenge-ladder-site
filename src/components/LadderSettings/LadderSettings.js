@@ -23,6 +23,8 @@ export default function LadderSettings(props) {
     const [success, setSuccess] = useState("");
     const [error, setError] = useState("");
     const [authorised, setAuthorised] = useState("");
+    const [authorisedText, setAuthorisedText] = useState("Authorising");
+
     const laddername = props.location.pathname
 
 
@@ -94,7 +96,7 @@ export default function LadderSettings(props) {
             <LoadingOverlay
                 active={loading}
                 spinner
-                text="Authorising">
+                text={authorisedText}>
                 <Container fluid style={{ paddingLeft: 0, paddingRight: 0 }}>
                     <Row>
                         <Col md="auto">
@@ -122,7 +124,7 @@ export default function LadderSettings(props) {
                                     {
                                         authorised ?
                                         <div>
-                                        <SettingsPage ladderParam={ladder} ></SettingsPage> </div>:
+                                        <SettingsPage ladder={ladder} setLoading={setLoading} setLoadingText={setAuthorisedText}></SettingsPage> </div>:
                                         <ForbiddenSettings></ForbiddenSettings>
                                     } 
                                 </div>
