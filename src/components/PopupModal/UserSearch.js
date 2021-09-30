@@ -25,10 +25,6 @@ export default function UserSearch({showSearch, setShowSearch, ladderData, purpo
         setShowSearch(false)
     }
 
-    const handleChangeFor = () => {
-        setShowSearch(false)
-    }
-
     const handleSubmit = (event) => {
         setUsers([]);
         event.preventDefault()
