@@ -1,7 +1,7 @@
 import React from 'react'
 import LadderUserDisplayer from './LadderUserDisplayer'
 
-export default function ViewRequests({ladder}) {
+export default function ViewRequests({ladder, setLoading, setSuccess, setError}) {
 
     if (ladder.permission == "Open"){
         return (
@@ -29,7 +29,7 @@ export default function ViewRequests({ladder}) {
 
     return (
         <div>
-            <LadderUserDisplayer ladderUserIds={ladder.requests}></LadderUserDisplayer>
+            <LadderUserDisplayer ladderUserIds={ladder.requests} type={"request"} setLoading={setLoading} ladder={ladder} setSuccess={setSuccess} setError={setError}></LadderUserDisplayer>
         </div>
     )
 }

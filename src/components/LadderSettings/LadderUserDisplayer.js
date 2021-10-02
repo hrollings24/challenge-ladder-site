@@ -13,7 +13,7 @@ import { useHistory } from "react-router-dom"
 require("firebase/functions")
 
 
-export default function LadderUserDisplayer({ladderUserIds, type, ladder, setLoading, setError, setLadder}) {
+export default function LadderUserDisplayer({ladderUserIds, type, ladder, setLoading, setError, setLadder, setSuccess}) {
     const [userDataLoaded, setUserDataLoaded] = useState(false)
     const [ladderUsers, setLadderUsers] = useState([])
     const history = useHistory()
@@ -55,10 +55,72 @@ export default function LadderUserDisplayer({ladderUserIds, type, ladder, setLoa
             case "invite":
                 removeInvite(ladderUser)
                 break
+            case "request":
+                deleteRequest(ladderUser)
+                break
         }
 
     }
 
+    const deleteRequest = async (ladderUser) =>{
+
+        setLoading(true)
+        //data = [requestUserID: String, ladderID: String, message: String, fromUser: String]
+        const data = {
+            requestUserID: ladderUser.userID,
+            ladderID: ladder.id,
+            message: "You request to join " + ladder.name + " has been rejected",
+            fromUser: MainUser.getInstance().userID,
+        }
+
+        const callableReturnMessage = firebase.functions().httpsCallable('rejectRequest');
+
+        callableReturnMessage(data).then((result) => {
+            ladder.refresh().then(() => {
+                setSuccess(result.message)
+                setLoading(false)
+            }).catch((error) => {
+                console.log(`error: ${JSON.stringify(error)}`);
+                setLoading(false)
+                });  
+
+        }).catch((error) => {
+            setLoading(false)
+            setError(error)
+        });
+
+
+    }
+
+    const acceptRequest = async (ladderUser) =>{
+
+        setLoading(true)
+        //data = [requestUserID: String, ladderID: String, message: String, fromUser: String]
+        const data = {
+            toUserID: ladderUser.userID,
+            ladderID: ladder.id,
+            message: "You request to join " + ladder.name + " has been accepted",
+            fromUser: MainUser.getInstance().userID,
+        }
+
+        const callableReturnMessage = firebase.functions().httpsCallable('acceptRequest');
+
+        callableReturnMessage(data).then((result) => {
+            ladder.refresh().then(() => {
+                setSuccess(result.message)
+                setLoading(false)
+            }).catch((error) => {
+                console.log(`error: ${JSON.stringify(error)}`);
+                setLoading(false)
+                });  
+
+        }).catch((error) => {
+            setLoading(false)
+            setError(error)
+        });
+
+
+    }
 
     const removeInvite = async (ladderUser) =>{
         setLoading(true)
@@ -213,12 +275,16 @@ export default function LadderUserDisplayer({ladderUserIds, type, ladder, setLoa
                                 <h4>{ladderUser.username}</h4>
                             </Col>
                             <Col className="container-fluid mt-2">
-                                {type == "invite" ?
+                                {type == "request"  ?
+                                <div><h4 onClick={() => submit(ladderUser)}>Delete</h4>
+                                <h4 onClick={() => acceptRequestCheck(ladderUser)}>Accept</h4>
+                                </div> : <div>
+                                {type == "invite"  ?
                                 <div><h4 onClick={() => submit(ladderUser)}>Delete</h4>
                                 </div> : 
                                 <div><h4 onClick={() => submit(ladderUser)}>Remove</h4>
                                 </div>
-                                }
+                                }</div>}
                             </Col>
                         </Row>  
                     </Col>
@@ -237,6 +303,24 @@ export default function LadderUserDisplayer({ladderUserIds, type, ladder, setLoa
             {
               label: "Yes",
               onClick: () => removeUser(ladderUser)
+            },
+            {
+              label: "No"
+              // onClick: () => alert("Click No")
+            }
+          ]
+        });
+      };
+
+
+      const acceptRequestCheck = (ladderUser) => {
+        confirmAlert({
+          title: "Confirm",
+          message: "Are you sure you want to accept this " + type + "?",
+          buttons: [
+            {
+              label: "Yes",
+              onClick: () => acceptRequest(ladderUser)
             },
             {
               label: "No"

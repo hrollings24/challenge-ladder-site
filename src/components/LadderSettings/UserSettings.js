@@ -5,7 +5,7 @@ import { Container, Row, Col, Button , Modal, Alert, Form} from "react-bootstrap
 import UserSearch from '../PopupModal/UserSearch'
 import LoadingOverlay from 'react-loading-overlay';
 
-export default function UserSettings({ladder, setLoading}) {
+export default function UserSettings({ladder, setLoading, setSuccess, setError}) {
     const [showSearch, setShowSearch] = useState(false)
 
     const addUserClicked = () => {
@@ -13,17 +13,12 @@ export default function UserSettings({ladder, setLoading}) {
     }
 
 
-    const viewInvitesClicked = () => {
-        setShowSearch(true)
-    }
-    
-
     return (
         <div>
             <UserSearch showSearch={showSearch} setShowSearch={setShowSearch} ladderData={ladder} purpose={"user"}></UserSearch>   
             <div style={{paddingTop:20, paddingLeft: 10}}>
             <h3>Requests</h3>
-            <ViewRequests ladder={ladder}></ViewRequests>
+            <ViewRequests ladder={ladder} setLoading={setLoading} setSuccess={setSuccess} setError={setError}></ViewRequests>
             <hr/>
             <Row>
                 <Col>

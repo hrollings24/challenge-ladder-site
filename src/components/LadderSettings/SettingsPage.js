@@ -9,9 +9,14 @@ import InviteSettings from './InviteSettings'
 
 export default function SettingsPage({ladder, setLoading, setLoadingText}) {
     const [error, setError] = useState(false)
+    const [success, setSuccess] = useState("")
 
     const removeErrorAlert = () =>{ 
         setError("")        
+    }
+
+    const removeSuccessAlert = () =>{ 
+        setSuccess("")        
     }
 
     return (
@@ -22,6 +27,9 @@ export default function SettingsPage({ladder, setLoading, setLoadingText}) {
                 <p>
                 {error}
                 </p>
+            </Alert>
+            <Alert show={success!=""} variant={'success'}>
+                {success} <Alert.Link onClick={() => removeSuccessAlert()}>Remove</Alert.Link>
             </Alert>
             <Container>
                 <Row>
@@ -37,7 +45,7 @@ export default function SettingsPage({ladder, setLoading, setLoadingText}) {
                             <AdminSettings ladder={ladder} setError={setError} setLoading={setLoading}/>
                         </Tab>
                         <Tab eventKey="users" title="Users">
-                            <UserSettings ladder={ladder} setLoading={setLoading}/>
+                            <UserSettings ladder={ladder} setLoading={setLoading} setSuccess={setSuccess} setError={setError}/>
                         </Tab>
                         <Tab eventKey="invites" title="Invites">
                             <InviteSettings ladder={ladder} setLoading={setLoading}/>
