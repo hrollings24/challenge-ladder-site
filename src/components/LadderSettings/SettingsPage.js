@@ -4,14 +4,16 @@ import UserSettings from './UserSettings'
 import OtherSettings from './OtherSettings'
 import { Tab, Tabs, Container, Row, Col, Alert } from "react-bootstrap"
 import LoadingOverlay from 'react-loading-overlay';
+import InviteSettings from './InviteSettings'
 
 
 export default function SettingsPage({ladder, setLoading, setLoadingText}) {
     const [error, setError] = useState(false)
-    
+
     const removeErrorAlert = () =>{ 
         setError("")        
     }
+
     return (
         <div>
         
@@ -36,6 +38,9 @@ export default function SettingsPage({ladder, setLoading, setLoadingText}) {
                         </Tab>
                         <Tab eventKey="users" title="Users">
                             <UserSettings ladder={ladder} setLoading={setLoading}/>
+                        </Tab>
+                        <Tab eventKey="invites" title="Invites">
+                            <InviteSettings ladder={ladder} setLoading={setLoading}/>
                         </Tab>
                         </Tabs>
                     </Col>

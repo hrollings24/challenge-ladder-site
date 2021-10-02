@@ -13,7 +13,7 @@ import { useHistory } from "react-router-dom"
 require("firebase/functions")
 
 
-export default function LadderUserDisplayer({ladderUserIds, type, ladder, setLoading, setError}) {
+export default function LadderUserDisplayer({ladderUserIds, type, ladder, setLoading, setError, setLadder}) {
     const [userDataLoaded, setUserDataLoaded] = useState(false)
     const [ladderUsers, setLadderUsers] = useState([])
     const history = useHistory()
@@ -30,6 +30,7 @@ export default function LadderUserDisplayer({ladderUserIds, type, ladder, setLoa
     },[ladderUsers]); 
 
     function startLoad(){
+        console.log(ladderUserIds)
         setLadderUsers([])
         ladderUserIds.map(loadUser)
     }
@@ -51,9 +52,40 @@ export default function LadderUserDisplayer({ladderUserIds, type, ladder, setLoa
             case "user":
                 deleteUser(ladderUser)
                 break
+            case "invite":
+                removeInvite(ladderUser)
+                break
         }
 
     }
+
+
+    const removeInvite = async (ladderUser) =>{
+        setLoading(true)
+
+        const db = firebase.firestore();
+        const noteRef = db.collection('notifications')
+        const ladderRef = db.collection('ladders').doc(ladder.id)
+        const userRef = db.collection('users').doc(ladderUser.userID)
+
+        const snapshot = await noteRef.where('type', '==', 'invite').where('ladder', '==', ladderRef).where('toUser', '==', userRef).get()
+        
+        if (snapshot.empty) {
+            console.log('No matching documents.');
+            return;
+        } 
+        else{
+            snapshot.forEach(doc => {
+                doc.ref.delete().then((result) => {
+                    ladder.refresh().then(() => {
+                        setLoading(false)                
+                    })
+                })
+            })
+        }
+        setLoading(false)
+    }
+
 
     const deleteUser = (ladderUser) => {
         console.log(ladderUser.getFullName())
@@ -181,7 +213,12 @@ export default function LadderUserDisplayer({ladderUserIds, type, ladder, setLoa
                                 <h4>{ladderUser.username}</h4>
                             </Col>
                             <Col className="container-fluid mt-2">
-                                <h4 onClick={() => submit(ladderUser)}>Remove</h4>
+                                {type == "invite" ?
+                                <div><h4 onClick={() => submit(ladderUser)}>Delete</h4>
+                                </div> : 
+                                <div><h4 onClick={() => submit(ladderUser)}>Remove</h4>
+                                </div>
+                                }
                             </Col>
                         </Row>  
                     </Col>

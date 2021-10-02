@@ -11,10 +11,14 @@ export default function UserSettings({ladder, setLoading}) {
     const addUserClicked = () => {
         setShowSearch(true)
     }
+
+
+    const viewInvitesClicked = () => {
+        setShowSearch(true)
+    }
     
 
     return (
-       
         <div>
             <UserSearch showSearch={showSearch} setShowSearch={setShowSearch} ladderData={ladder} purpose={"user"}></UserSearch>   
             <div style={{paddingTop:20, paddingLeft: 10}}>
