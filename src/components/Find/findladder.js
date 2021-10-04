@@ -47,6 +47,7 @@ export default function FindLadder() {
 
             if (snapshot.empty) {
                 console.log('No matching documents.');
+                setLoading(false)
                 return;
             } 
             else{
