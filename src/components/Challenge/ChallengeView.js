@@ -7,11 +7,16 @@ import firebase from 'firebase/app';
 import 'firebase/firestore';
 import { useAuth } from "../../contexts/AuthContext"
 import MainUser from "../../Persistance/MainUser"
+import LoadingOverlay from 'react-loading-overlay';
+import ChallengeActionView from "./ChallengeActionView.js";
+import SystemNotification from "../../Persistance/SystemNotification.js";
 
 export default function ChallengeView() {
     const location = useLocation();
     const [challengeLoaded, setChallengeLoaded] = useState(false)
     const [challenge, setChallenge] = useState(new Challenge)
+    const [challengeNote, setChallengeNote] = useState()
+
     const { currentUser, logout } = useAuth()
     const [userDataLoaded, setUserDataLoaded] = useState(false)
 
@@ -36,7 +41,25 @@ export default function ChallengeView() {
         const ref = challengeCollection.doc(location.search.split('=')[1])
         await challenge.load(ref)
         console.log(challenge.userToChallenge.getFullName())
-        setChallengeLoaded(true)
+
+        //find notifictions to do with challenge
+        const noteSnapshots = await db.collection('notifications').where("challengeRef", "==", ref).get()
+
+        if (noteSnapshots.empty) {
+            console.log('No matching notifications');
+            setChallengeLoaded(true)
+        } 
+        else{
+            noteSnapshots.forEach(note => {
+                const data = note.data()
+                let noteAsNote = new SystemNotification()
+                noteAsNote.load(data, note.id)
+                setChallengeNote(noteAsNote)
+                console.log("Settingloading")
+                setChallengeLoaded(true)
+            })
+        }
+
      }, []);
     
      useEffect(() => {
@@ -48,27 +71,30 @@ export default function ChallengeView() {
 
     return (
         <div>
-            <Container fluid style={{ paddingLeft: 0, paddingRight: 0 }}>
-                <Row>
-                    <Col md="auto">
-                        <Sidebar></Sidebar>
-                    </Col>
-                    <Col>
-                        <Row style={{ paddingTop: 20, paddingRight: 20}}> 
-                            <Col>
-                                {
-                                    challengeLoaded ?
+            <LoadingOverlay
+                active={!challengeLoaded}
+                spinner
+                text={"Loading"}>
+                <Container fluid style={{ paddingLeft: 0, paddingRight: 0 }}>
+                    <Row>
+                        <Col md="auto">
+                            <Sidebar></Sidebar>
+                        </Col>
+                        <Col>
+                            <Row style={{ paddingTop: 20, paddingRight: 20}}> 
+                                <Col>
                                     <div>
                                         <h1>Challenge with {challenge.userToChallenge.getFullName()}</h1>
                                         <h2>{challenge.ladderName}</h2>
-                                    </div>:
-                                    <div>loading...</div>
-                                }
-                            </Col>
-                        </Row>
-                    </Col>
-                </Row>
-            </Container>
+                                    </div>
+                                    <ChallengeActionView challenge={challenge} notification={challengeNote}></ChallengeActionView>
+                                </Col>
+                            </Row>
+                        </Col>
+                    </Row>
+                </Container>
+                
+            </LoadingOverlay>
         </div>
     )
 }

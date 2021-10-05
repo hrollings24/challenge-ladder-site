@@ -10,6 +10,9 @@ import '@firebase/storage'
 import { useHistory, useLocation } from "react-router-dom"
 import LoadingOverlay from 'react-loading-overlay';
 import Avatar from 'react-avatar';
+import { confirmAlert } from "react-confirm-alert";
+import { TextField } from '@material-ui/core';
+import {ReactSpinner} from 'react-spinning-wheel';
 
 
 export default function Account() {
@@ -20,6 +23,9 @@ export default function Account() {
     const [image, setImage] = useState({ preview: "", raw: "" })
     const [profileImage, setProfileImage] = useState(null);
     const [show, setShow] = useState(false);
+    const [showUsernameModal, setShowUsernameModal] = useState(false);
+    const [usernameLoading, setUsernameLoading] = useState(false);
+    const [username, setUsername] = useState("");
     const [showSuccessAlert, setShowSuccessAlert] = useState(false);
     const location = useLocation()
     const [loading, setLoading] = useState(true);
@@ -46,6 +52,40 @@ export default function Account() {
         }
     }
 
+
+    const handleUsernameChange = () => {
+        //check username in backend
+        const db = firebase.firestore();
+        setUsernameLoading(true)
+        const data = {
+            username: username
+        };
+
+        const callableReturnMessage = firebase.functions().httpsCallable('checkUsername');
+        callableReturnMessage(data).then((result) => {
+            if (result.data){
+                //change username
+
+                var ref = db.collection("users").doc(MainUser.getInstance().userID)
+                ref.update({username: username}).then((result) => {
+                    setShowSuccessAlert(true)
+                    setUsernameLoading(false)
+                    MainUser.getInstance().refresh()
+                }).catch((error) => {
+                  console.log(`error: ${JSON.stringify(error)}`);
+                  setUsernameLoading(false)
+                  setError(`error: ${JSON.stringify(error)}`)
+                });
+            }
+            else{
+                setError("Username already taken")
+            }
+            setUsernameLoading(false)
+          }).catch((error) => {
+            setUsernameLoading(false)
+            setError(`error: ${JSON.stringify(error)}`)
+          });
+    }
 
     const handleUpload = () => {
         console.log(newProfileImage)
@@ -92,6 +132,9 @@ export default function Account() {
 
     const handleShow = () => setShow(true);
     const handleClose = () => setShow(false);
+
+    const handleUsernameShow = () => setShowUsernameModal(true);
+    const handleUsernameClose = () => setShowUsernameModal(false);
 
     const handleSave = () => {
 
@@ -141,6 +184,47 @@ export default function Account() {
         userLoaded()
     },[]); 
 
+    const deleteAccount = () => {
+        confirmAlert({
+          title: "Confirm",
+          message: "Are you sure you want to delete your account?",
+          buttons: [
+            {
+              label: "Yes",
+              onClick: () => deleteConfirmed()
+            },
+            {
+              label: "No"
+              // onClick: () => alert("Click No")
+            }
+          ]
+        });
+      };
+
+      const goHome = () =>{ 
+        history.push('/')
+      }
+
+    const deleteConfirmed = () => {
+        setLoading(true)
+        setLoadingText("Loading")
+
+        const accountData = {
+            userID: MainUser.getInstance().userID,
+        };
+
+        const callableReturnMessage = firebase.functions().httpsCallable('deleteUser');
+        callableReturnMessage(accountData).then((result) => {
+            setLoading(false)
+            goHome()
+          }).catch((error) => {
+              showErrorAlert()
+              setLoadingText("Loading")
+              setLoading(false)
+            console.log(`error: ${JSON.stringify(error)}`);
+          });
+    }
+
 
     return (
         <div>
@@ -157,6 +241,24 @@ export default function Account() {
             </Button>
             <Button variant="primary" onClick={handleUpload}>
                 Upload
+            </Button>
+            </Modal.Footer>
+            </Modal>
+
+            <Modal show={showUsernameModal} onHide={handleUsernameClose}>
+            <Modal.Header closeButton>
+            <Modal.Title>Change Username</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+                {usernameLoading ? <ReactSpinner/> : <div></div>}
+            </Modal.Body>
+            <Modal.Footer>
+            <Button variant="secondary" onClick={handleUsernameClose}>
+                Cancel
+            </Button>
+            <Button variant="primary" onClick={handleUsernameChange}>
+                Change
             </Button>
             </Modal.Footer>
             </Modal>
@@ -182,7 +284,7 @@ export default function Account() {
                                 Error: {error} <Alert.Link onClick={() => removeAlert()} >Remove</Alert.Link>
                             </Alert>
                             <Row style={{ paddingTop: 20, paddingRight: 20}}>
-                            <Col md="auto">
+                                <Col md="auto">
                                     <Row>
                                         <Avatar round = {true} name={MainUser.getInstance().getFullName()} src={profileImage}/>
                                     </Row> 
@@ -192,10 +294,10 @@ export default function Account() {
                                     </Button>
                                     </Row>
                                     <Row style={{paddingTop: 20}}>
-                                    <Button variant="primary" onClick={handleSave}>
-                                        Save
+                                    <Button variant="primary" onClick={handleUsernameShow}>
+                                        Change Username
                                     </Button>
-                                    </Row> 
+                                    </Row>
                                 </Col>
                                 <Col md="auto" style={{paddingRight: 20}}>
                                     <Row style={{paddingRight: 20}}>
@@ -206,6 +308,17 @@ export default function Account() {
                                     </Row>
                                 </Col>
                             </Row>
+                            <Row style={{paddingTop: 20, paddingBottom: 20}}>
+                                <Button variant="primary" onClick={handleSave}>
+                                    Save
+                                </Button>
+                            </Row> 
+                            <hr/>
+                            <Row style={{paddingTop: 20}}>
+                                <Button variant="danger" onClick={deleteAccount}>
+                                    Delete Account
+                                </Button>
+                            </Row> 
                         </Col>
                     </Row>
                 </Container>
