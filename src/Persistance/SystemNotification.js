@@ -12,6 +12,7 @@ export default class SystemNotification{
     title = ""
     ladderRef = ""
     id = ""
+    challengeRef = ""
 
     constructor(){}
 
@@ -22,6 +23,9 @@ export default class SystemNotification{
         this.type = data.type
         this.title = data.title
         this.ladderRef = data.ladder
+        if (data.challengeRef != null){
+            this.challengeRef = data.challengeRef
+        }
     }
 
     delete(){

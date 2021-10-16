@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom";
-import { Container, Row, Col } from "react-bootstrap"
+import { Container, Row, Col, Alert } from "react-bootstrap"
 import Sidebar from "../Sidebar.js"
 import Challenge from "../../Persistance/Challenge"
 import firebase from 'firebase/app';
@@ -13,9 +13,11 @@ import SystemNotification from "../../Persistance/SystemNotification.js";
 
 export default function ChallengeView() {
     const location = useLocation();
-    const [challengeLoaded, setChallengeLoaded] = useState(false)
+    const [challengeLoading, setChallengeLoading] = useState(true)
     const [challenge, setChallenge] = useState(new Challenge)
-    const [challengeNote, setChallengeNote] = useState()
+    const [success, setSuccess] = useState("")
+    const [error, setError] = useState("")
+
 
     const { currentUser, logout } = useAuth()
     const [userDataLoaded, setUserDataLoaded] = useState(false)
@@ -35,44 +37,34 @@ export default function ChallengeView() {
         userLoaded()
     },[]); 
 
+    const removeErrorAlert = () => {
+        setError("")
+    }
+
+    const removeAlert = () => {
+        setSuccess("")
+    }
+
+
     useEffect(async () => {
         const db = firebase.firestore();
         const challengeCollection = db.collection('challenge');
         const ref = challengeCollection.doc(location.search.split('=')[1])
         await challenge.load(ref)
-        console.log(challenge.userToChallenge.getFullName())
-
-        //find notifictions to do with challenge
-        const noteSnapshots = await db.collection('notifications').where("challengeRef", "==", ref).get()
-
-        if (noteSnapshots.empty) {
-            console.log('No matching notifications');
-            setChallengeLoaded(true)
-        } 
-        else{
-            noteSnapshots.forEach(note => {
-                const data = note.data()
-                let noteAsNote = new SystemNotification()
-                noteAsNote.load(data, note.id)
-                setChallengeNote(noteAsNote)
-                console.log("Settingloading")
-                setChallengeLoaded(true)
-            })
-        }
-
+        setChallengeLoading(false)
      }, []);
     
      useEffect(() => {
-        if (challengeLoaded){
+        if (challengeLoading){
             console.log(challenge.userToChallenge.getFullName())
         }
-    },[challengeLoaded]); 
+    },[challengeLoading]); 
 
 
     return (
         <div>
             <LoadingOverlay
-                active={!challengeLoaded}
+                active={challengeLoading}
                 spinner
                 text={"Loading"}>
                 <Container fluid style={{ paddingLeft: 0, paddingRight: 0 }}>
@@ -87,7 +79,22 @@ export default function ChallengeView() {
                                         <h1>Challenge with {challenge.userToChallenge.getFullName()}</h1>
                                         <h2>{challenge.ladderName}</h2>
                                     </div>
-                                    <ChallengeActionView challenge={challenge} notification={challengeNote}></ChallengeActionView>
+                                    <div>
+                                    <Alert show={error!=""} variant="danger" onClose={() => removeErrorAlert()} dismissible>
+                                    <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
+                                        <p>
+                                        {error}
+                                        </p>
+                                    </Alert>
+                                    <Alert show={success!=""} variant="success" onClose={() => removeAlert()} dismissible>
+                                        <Alert.Heading>Success!</Alert.Heading>
+                                        <p>
+                                        {success}
+                                        </p>
+                                    </Alert>
+                                    </div>
+
+                                    <ChallengeActionView challenge={challenge} setSuccess={setSuccess} setError={setError} setLoading={setChallengeLoading}></ChallengeActionView>
                                 </Col>
                             </Row>
                         </Col>

@@ -16,7 +16,7 @@ export default function Home(props){
     const { currentUser, logout } = useAuth()
     const history = useHistory()
     const location = useLocation();
-    const [showAlert, setShowAlert] = useState(false)
+    const [alerttext, setAlertText] = useState("")
     const [userDataLoaded, setUserDataLoaded] = useState(false)
 
     async function userLoaded() {
@@ -35,13 +35,16 @@ export default function Home(props){
         console.log("At home")
         let query = location.search
         if (query == "?success"){
-            setShowAlert(true)
+            setAlertText("Successfully removed from ladder")
+        }
+        if (query == "?success-challenge-decline"){
+            setAlertText("Successfully declined the challenge")
         }
         userLoaded()
     },[]); 
 
     const removeAlert = () =>{ 
-        setShowAlert(false)
+        setAlertText("")
         history.replace('/')
     }
     
@@ -62,8 +65,8 @@ export default function Home(props){
                                     <Row>
                                     <h1 className = "homeh2">Home</h1>
                                     </Row>
-                                    <Alert show={showAlert} variant={'success'}>
-                                        Successfully removed from ladder. <Alert.Link onClick={() => removeAlert()} >Remove</Alert.Link>
+                                    <Alert show={alerttext!=""} variant={'success'}>
+                                        {alerttext} <Alert.Link onClick={() => removeAlert()} >Remove</Alert.Link>
                                     </Alert>
                                     <Row>
                                     <DoIHaveNotifications></DoIHaveNotifications>

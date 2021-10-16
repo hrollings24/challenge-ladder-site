@@ -36,7 +36,7 @@ export default function NotificationCards({setProcessingNote, setError, setSucce
                 return (
                     <div>
                         <Card.Link href="#">Accept</Card.Link>
-                        <Card.Link href="#">Decline</Card.Link>
+                        <Card.Link onClick={() => { declineChallenge(notification)}}>Decline</Card.Link>
                     </div>
                 )
             case 'invite':
@@ -86,7 +86,7 @@ export default function NotificationCards({setProcessingNote, setError, setSucce
         const data = {
             oldNoteID: notification.id,
             oldnoteToUser: MainUser.getInstance().userID,
-            oldNoteFromUser: notification.fromUser.id,
+            oldNoteFromUser: notification.fromUserRef.id,
             ladderRef: notification.ladderRef,
             username: MainUser.getInstance().username,
         };
@@ -106,7 +106,7 @@ export default function NotificationCards({setProcessingNote, setError, setSucce
         const data = {
             oldNoteID: notification.id,
             oldnoteToUser: MainUser.getInstance().userID,
-            oldNoteFromUser: notification.fromUser.id,
+            oldNoteFromUser: notification.fromUserRef.id,
             ladderRef: notification.ladderRef,
             username: MainUser.getInstance().username,
         };
@@ -160,6 +160,39 @@ export default function NotificationCards({setProcessingNote, setError, setSucce
         setSuccess("Invite accepted")
         setProcessingNote(false)
 
+    }
+
+    const declineChallenge = (notification) => {
+        setProcessingNote(true)
+
+        //data = [toUserID, message, fromUserID, ladderID, challengeID]
+        const data = {
+            toUserID: notification.fromUserRef.id,
+            message: MainUser.getInstance().username + " has declined your challenge",
+            fromUserID: MainUser.getInstance().userID,
+            ladderID: notification.ladderRef.id,
+            challengeID: notification.challengeRef.id
+        };
+
+        console.log(data)
+
+        const callableReturnMessage = firebase.functions().httpsCallable('declineChallenge');
+        callableReturnMessage(data).then((result) => {
+            if (result.data.title == "Success"){
+                //change username
+                MainUser.getInstance().refresh().then(() => {
+                    setProcessingNote(false)
+                    setSuccess("Challenge declined")
+                })
+            }
+            else{
+                setError(result.data.message)
+                setProcessingNote(false)
+            }
+        }).catch((error) => {
+            setError(`error: ${JSON.stringify(error)}`)
+            setProcessingNote(false)
+          });
     }
 
 

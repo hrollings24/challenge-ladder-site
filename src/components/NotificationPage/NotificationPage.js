@@ -56,10 +56,10 @@ export default function NotificationPage() {
                     <Col style={{ paddingTop: 20, paddingRight: 20}}>
                         <h1>Notifications</h1>  
                         <Alert show={success!=""} variant={'success'}>
-                            {success}<Alert.Link onClick={() => removeAlert()} >. Remove</Alert.Link>
+                            {success} <Alert.Link onClick={() => removeAlert()} >Remove</Alert.Link>
                         </Alert>
-                        <Alert show={error!=""} variant={'error'}>
-                            {error}<Alert.Link onClick={() => removeAlert()} >. Remove</Alert.Link>
+                        <Alert show={error!=""} variant={'danger'}>
+                            {error} <Alert.Link onClick={() => removeAlert()} >Remove</Alert.Link>
                         </Alert>
                         <NotificationCards setProcessingNote={setLoading} setError={setError} setSuccess={setSuccess}></NotificationCards>
                     </Col>
