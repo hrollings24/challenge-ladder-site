@@ -18,7 +18,35 @@ export default function AwaitingResponseView({challenge, setSuccess, setError, s
     }
 
     const acceptChallenge = () => {
-      
+        setLoading(true)
+        //data = [toUserID, message, fromUserID, ladderID, challengeID]
+        const data = {
+            toUser: challenge.userToChallenge.userID,
+            message: MainUser.getInstance().username + " has accepted your challenge",
+            fromUser: MainUser.getInstance().userID,
+            ladderID: challenge.ladder,
+            challengeID: challenge.id
+        };
+
+        console.log(data)
+
+        const callableReturnMessage = firebase.functions().httpsCallable('acceptChallenge');
+        callableReturnMessage(data).then((result) => {
+            if (result.data.title == "Success"){
+                MainUser.getInstance().refresh().then(() => {
+                    challenge.refresh().then(() => {
+                        setLoading(false)
+                    })
+                })
+            }
+            else{
+                setError(result.data.message)
+                setLoading(false)
+            }
+        }).catch((error) => {
+            setError(`error: ${JSON.stringify(error)}`)
+            setLoading(false)
+        });
     }
 
     const declineChallenge = () => {
@@ -53,7 +81,8 @@ export default function AwaitingResponseView({challenge, setSuccess, setError, s
           });
     }
 
-    if (challenge.status == "Awaiting Response" && challenge.userToChallenge.userID == MainUser.getInstance().userID){
+    console.log(challenge)
+    if (challenge.userToChallenge.userID == MainUser.getInstance().userID){
         return (
             <div>
                 Awaiting a response from the other user

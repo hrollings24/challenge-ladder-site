@@ -17,6 +17,7 @@ export default function ChallengeView() {
     const [challenge, setChallenge] = useState(new Challenge)
     const [success, setSuccess] = useState("")
     const [error, setError] = useState("")
+    const [lost, setLost] = useState(false)
 
 
     const { currentUser, logout } = useAuth()
@@ -50,13 +51,19 @@ export default function ChallengeView() {
         const db = firebase.firestore();
         const challengeCollection = db.collection('challenge');
         const ref = challengeCollection.doc(location.search.split('=')[1])
-        await challenge.load(ref)
+        try{
+            await challenge.load(ref)
+        }
+        catch{
+            setLost(true)
+            setChallengeLoading(false)
+        }
         setChallengeLoading(false)
      }, []);
     
      useEffect(() => {
-        if (challengeLoading){
-            console.log(challenge.userToChallenge.getFullName())
+        if (!challengeLoading){
+            console.log(challenge)
         }
     },[challengeLoading]); 
 
@@ -73,6 +80,7 @@ export default function ChallengeView() {
                             <Sidebar></Sidebar>
                         </Col>
                         <Col>
+                            {lost ? <div>404 Not Found</div> :
                             <Row style={{ paddingTop: 20, paddingRight: 20}}> 
                                 <Col>
                                     <div>
@@ -97,6 +105,7 @@ export default function ChallengeView() {
                                     <ChallengeActionView challenge={challenge} setSuccess={setSuccess} setError={setError} setLoading={setChallengeLoading}></ChallengeActionView>
                                 </Col>
                             </Row>
+                            }
                         </Col>
                     </Row>
                 </Container>
