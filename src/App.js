@@ -4,7 +4,6 @@ import { Container } from 'react-bootstrap'
 import { AuthProvider } from './contexts/AuthContext';
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import Home from './components/Home/Home.js';
-import Login from './components/Login';
 import PrivateRoute from './Routes/PrivateRoute';
 import ViewLadder from './components/Ladder/ViewLadder';
 import NotificationPage from './components/NotificationPage/NotificationPage';
@@ -32,7 +31,6 @@ function App() {
               <PrivateRoute exact path="/findladders" component={FindLadder} />
               <PrivateRoute exact path="/create" component={CreateLadder} />
               <Route path="/signup" component={Signup} />
-              <Route path="/login" component={Login} />
               <Route path="/home" component={HomeAway} />
               <Route exact path="/:ladderurl" component={ViewLadder} />
               <PrivateRoute exact path="/:ladderurl/admin" component={LadderSettings} />

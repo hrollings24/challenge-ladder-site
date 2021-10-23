@@ -4,6 +4,8 @@ import { Container, Row, Col, Button , Modal, Alert, Form} from "react-bootstrap
 import { useAuth } from "../../contexts/AuthContext"
 import { Link, useHistory } from "react-router-dom"
 import MainUser from "../../Persistance/MainUser"
+import firebase from "firebase";
+import {ReactSpinner} from 'react-spinning-wheel';
 
 export default function NavBar(usersname) {
     const [usersName, serUsersName] = useState(null)
@@ -27,23 +29,32 @@ export default function NavBar(usersname) {
             setError("")
             setLoading(true)
             await login(emailRef.current.value, passwordRef.current.value)
-            let userID = currentUser.uid;
-            let user = MainUser.getInstance();
-            await user.setUser(userID);
-            setSignedIn(true)
         } catch {
+            setLoading(false)
             setError("Failed to log in")
         }
-        setLoading(false)
-
-        
-      }
+    }
 
     useEffect(() => {
         if (signedIn) {
             history.push("/")
         }
     },[signedIn]);
+
+    useEffect(() => {
+        console.log("loading changed, now set to: " + loading)
+    },[loading]);
+
+
+    useEffect( () => {   
+        if (currentUser){
+            let user = MainUser.getInstance();
+            user.setUser(currentUser.uid).then(result => {
+                setLoading(false)
+                setSignedIn(true)
+            })
+        } 
+    },[currentUser]);
 
     return (
         <div>
@@ -64,13 +75,13 @@ export default function NavBar(usersname) {
                     </Form.Group>
                 </Modal.Body>
             <Modal.Footer>
-
                 <Button variant="secondary" onClick={handleClose}>
                     Cancel
                 </Button>
-                <Button variant="primary" type="submit">
+                {loading ? <ReactSpinner/> : <Button variant="primary" type="submit">
                     Log In
-                </Button>
+                </Button>}
+                
                 </Modal.Footer>
             </Form>
             </Modal>
