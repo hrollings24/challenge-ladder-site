@@ -4,10 +4,12 @@ import MainUser from "../../Persistance/MainUser"
 import SystemNotification from "../../Persistance/SystemNotification"
 import firebase from 'firebase/app';
 import 'firebase/firestore';
+import { useHistory } from "react-router-dom";
 
 
 export default function NotificationCards({setProcessingNote, setError, setSuccess}) {
-   
+    const history = useHistory();
+
 
     const renderCards = (notification) => {
         return (
@@ -35,7 +37,7 @@ export default function NotificationCards({setProcessingNote, setError, setSucce
             case 'challenge':
                 return (
                     <div>
-                        <Card.Link href="#">Accept</Card.Link>
+                        <Card.Link onClick={() => { acceptChallenge(notification)}}>Accept</Card.Link>
                         <Card.Link onClick={() => { declineChallenge(notification)}}>Decline</Card.Link>
                     </div>
                 )
@@ -43,7 +45,7 @@ export default function NotificationCards({setProcessingNote, setError, setSucce
                 return (
                     <div>
                         <Card.Link onClick={() => { acceptNormalInvite(notification) }}>Accept</Card.Link>
-                        <Card.Link href="#">Decline</Card.Link>
+                        <Card.Link onClick={() => { declineNormalInvite(notification) }}>Decline</Card.Link>
                     </div>
                 )
             case 'admin':
@@ -56,20 +58,20 @@ export default function NotificationCards({setProcessingNote, setError, setSucce
             case 'request':
                 return (
                     <div>
-                        <Card.Link href="#">Go To Request</Card.Link>
+                        <Card.Link onClick={() => gotoRequest(notification)}>Go To Request</Card.Link>
                     </div>
                 )
             case 'challengeSelected':
                 return (
                     <div>
-                        <Card.Link href="#">View Challenge</Card.Link>
-                        <Card.Link href="#">OK</Card.Link>
+                        <Card.Link onClick={() => viewChallenge(notification)} >View Challenge</Card.Link>
+                        <Card.Link onClick={() => removeNote(notification)} >OK</Card.Link>
                     </div>
                 )    
             default:
                 return (
                     <div>
-                        <Card.Link href="#">OK</Card.Link>
+                        <Card.Link onClick={() => removeNote(notification)} >OK</Card.Link>
                     </div>
                 )
                 
@@ -80,6 +82,10 @@ export default function NotificationCards({setProcessingNote, setError, setSucce
 
 
     //Button functions
+
+    const viewChallenge = (notification) => {
+        history.push("challenge?query=" + notification.challengeRef.id)
+    }
 
     const declineAdminInvite = (notification) => {
         //data = [oldNoteID: String, oldnoteToUser: String, oldNoteFromUser: String, ladderRef: String, username: String]
@@ -195,12 +201,49 @@ export default function NotificationCards({setProcessingNote, setError, setSucce
           });
     }
 
+    const acceptChallenge = (notification) => {
+        setProcessingNote(true)
+        //data = [toUserID, message, fromUserID, ladderID, challengeID]
+        const data = {
+            toUser: notification.fromUserRef.id,
+            message: MainUser.getInstance().username + " has accepted your challenge",
+            fromUser: MainUser.getInstance().userID,
+            ladderID: notification.ladderRef.id,
+            challengeID: notification.challengeRef.id
+        };
+
+        console.log(data)
+
+        const callableReturnMessage = firebase.functions().httpsCallable('acceptChallenge');
+        callableReturnMessage(data).then((result) => {
+            if (result.data.title == "Success"){
+                MainUser.getInstance().refresh().then(() => {
+                    setProcessingNote(false)
+                    setSuccess("Challenge accepted")
+                })
+            }
+            else{
+                setError(result.data.message)
+                setProcessingNote(false)
+            }
+        }).catch((error) => {
+            setError(`error: ${JSON.stringify(error)}`)
+            setProcessingNote(false)
+        });
+    }
+
 
     const removeNote = async (notification) => {
         setProcessingNote(true)
         await notification.delete()
         await MainUser.getInstance().refresh()
         setProcessingNote(false)
+    }
+
+    const gotoRequest = async (notification) => {
+        //Get ladder url
+        var ladder = await notification.ladderRef.get();
+        history.push("/" + ladder.data().url + "/admin?=requests");
     }
 
     return (

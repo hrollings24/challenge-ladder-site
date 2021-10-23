@@ -39,8 +39,8 @@ export default function ChallengeCards() {
             <div className="d-flex flex-row flex-nowrap">
                 <Container>
                     <Row>
-                        {MainUser.getInstance().getChallenges().map(renderCards)}
-                  </Row>
+                        {MainUser.getInstance().getChallenges().length == 0 ? <div>You have no challenges. Start a challenge in a ladder today!</div> : MainUser.getInstance().getChallenges().map(renderCards)}
+                    </Row>
                 </Container>
             </div>
         </div>

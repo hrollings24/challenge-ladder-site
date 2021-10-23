@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import AdminSettings from './AdminSettings'
 import UserSettings from './UserSettings'
 import OtherSettings from './OtherSettings'
@@ -7,7 +7,7 @@ import LoadingOverlay from 'react-loading-overlay';
 import InviteSettings from './InviteSettings'
 
 
-export default function SettingsPage({ladder, setLoading, setLoadingText}) {
+export default function SettingsPage({ladder, setLoading, setLoadingText, selectedTab}) {
     const [error, setError] = useState(false)
     const [success, setSuccess] = useState("")
 
@@ -17,7 +17,7 @@ export default function SettingsPage({ladder, setLoading, setLoadingText}) {
 
     const removeSuccessAlert = () =>{ 
         setSuccess("")        
-    }
+    } 
 
     return (
         <div>
@@ -37,7 +37,7 @@ export default function SettingsPage({ladder, setLoading, setLoadingText}) {
                 </Row>
                 <Row>
                     <Col>
-                        <Tabs defaultActiveKey="laddersettings" id="settingstab" transition={false}>
+                        <Tabs defaultActiveKey={selectedTab} id="settingstab" transition={false}>
                         <Tab eventKey="laddersettings" title="Settings">
                             <OtherSettings ladder={ladder} setLoading={setLoading} setError={setError} setLoadingText={setLoadingText}/>
                         </Tab>

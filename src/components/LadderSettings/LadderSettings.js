@@ -24,6 +24,8 @@ export default function LadderSettings(props) {
     const [error, setError] = useState("");
     const [authorised, setAuthorised] = useState("");
     const [authorisedText, setAuthorisedText] = useState("Authorising");
+    const [defaultTab, setDefaultTab] = useState("laddersettings");
+
 
     const laddername = props.location.pathname
 
@@ -36,9 +38,15 @@ export default function LadderSettings(props) {
         let url = ""
         if (name[0] == ""){
             url = name[1]
+            if (props.location.search == "?=requests"){
+                setDefaultTab("users")
+            }
         }
         else{
             url = name[0]
+            if (props.location.search == "?=requests"){
+                setDefaultTab("users")
+            }
         }
         const ladderRefs = await db.collection('ladders').where("url", "==", url).get()  
         
@@ -124,7 +132,7 @@ export default function LadderSettings(props) {
                                     {
                                         authorised ?
                                         <div>
-                                        <SettingsPage ladder={ladder} setLoading={setLoading} setLoadingText={setAuthorisedText}></SettingsPage> </div>:
+                                        <SettingsPage ladder={ladder} setLoading={setLoading} setLoadingText={setAuthorisedText} selectedTab={defaultTab}></SettingsPage> </div>:
                                         <ForbiddenSettings></ForbiddenSettings>
                                     } 
                                 </div>
