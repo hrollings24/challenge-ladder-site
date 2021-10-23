@@ -4,7 +4,7 @@ import MainUser from "../../Persistance/MainUser"
 import firebase from 'firebase/app';
 require("firebase/functions")
 
-export default function RankText({ userandladder, loading, setLoading, setSuccess, setError}) {
+export default function RankText({ userandladder, setLoading, setSuccess, setError}) {
     const history = useHistory()
     const ladderuser = userandladder[0]
     const ladder = userandladder[1]
